@@ -1,5 +1,6 @@
-import React from "react";
-import { Link } from "react-router-dom";
+import React, { useEffect } from "react";
+import { Link, useNavigate } from "react-router-dom";
+import { jwtDecode } from "jwt-decode";
 import {
   Search,
   Filter,
@@ -21,17 +22,29 @@ const SupplierList = ({
   statusFilter,
   setStatusFilter,
   updateSupplierStatus,
+  userRole,
 }) => {
-  if (loading) {
-    return (
-      <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100 flex justify-center items-center">
-        <div className="text-center">
-          <div className="animate-spin rounded-full h-16 w-16 border-t-4 border-b-4 border-blue-500 mx-auto mb-4"></div>
-          <p className="text-gray-600 font-medium">Loading suppliers...</p>
-        </div>
-      </div>
-    );
-  }
+  const navigate = useNavigate();
+
+  // Authentication check
+  useEffect(() => {
+    const token = localStorage.getItem("token");
+    if (!token) {
+      navigate("/login");
+      return;
+    }
+
+    try {
+      const decoded = jwtDecode(token);
+      if (decoded.exp * 1000 < Date.now()) {
+        localStorage.removeItem("token");
+        navigate("/login");
+      }
+    } catch (error) {
+      localStorage.removeItem("token");
+      navigate("/login");
+    }
+  }, [navigate]);
 
   const getStatusColor = (status) => {
     switch (status) {
@@ -43,6 +56,48 @@ const SupplierList = ({
         return "bg-amber-100 text-amber-800 border-amber-200";
     }
   };
+
+  const renderActionButtons = (supplier) => {
+    return (
+      <div className="flex flex-wrap gap-2 justify-center">
+        <Link
+          to={`/supplier/${supplier._id}`}
+          className="px-3 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors duration-200 font-medium text-sm"
+        >
+          View Details
+        </Link>
+
+        {userRole === "admin" && supplier.status !== "Approved" && (
+          <button
+            onClick={() => updateSupplierStatus(supplier._id, "Approved")}
+            className="px-3 py-2 bg-emerald-600 text-white rounded-lg hover:bg-emerald-700 transition-colors duration-200 font-medium text-sm"
+          >
+            Approve
+          </button>
+        )}
+
+        {userRole === "admin" && supplier.status !== "Rejected" && (
+          <button
+            onClick={() => updateSupplierStatus(supplier._id, "Rejected")}
+            className="px-3 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 transition-colors duration-200 font-medium text-sm"
+          >
+            Reject
+          </button>
+        )}
+      </div>
+    );
+  };
+
+  if (loading) {
+    return (
+      <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100 flex justify-center items-center">
+        <div className="text-center">
+          <div className="animate-spin rounded-full h-16 w-16 border-t-4 border-b-4 border-blue-500 mx-auto mb-4"></div>
+          <p className="text-gray-600 font-medium">Loading suppliers...</p>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100 p-6">
@@ -251,36 +306,7 @@ const SupplierList = ({
                         </span>
                       </div>
 
-                      <div className="flex flex-wrap gap-2 justify-center">
-                        <Link
-                          to={`/supplier/${supplier._id}`}
-                          className="px-3 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors duration-200 font-medium text-sm"
-                        >
-                          View Details
-                        </Link>
-
-                        {supplier.status !== "Approved" && (
-                          <button
-                            onClick={() =>
-                              updateSupplierStatus(supplier._id, "Approved")
-                            }
-                            className="px-3 py-2 bg-emerald-600 text-white rounded-lg hover:bg-emerald-700 transition-colors duration-200 font-medium text-sm"
-                          >
-                            Approve
-                          </button>
-                        )}
-
-                        {supplier.status !== "Rejected" && (
-                          <button
-                            onClick={() =>
-                              updateSupplierStatus(supplier._id, "Rejected")
-                            }
-                            className="px-3 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 transition-colors duration-200 font-medium text-sm"
-                          >
-                            Reject
-                          </button>
-                        )}
-                      </div>
+                      {renderActionButtons(supplier)}
                     </div>
                   </div>
                 </div>
