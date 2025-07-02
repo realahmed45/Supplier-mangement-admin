@@ -9,6 +9,8 @@ import {
   Package,
   MapPin,
   Clock,
+  FileText,
+  Truck,
 } from "lucide-react";
 
 const SupplierList = ({
@@ -150,9 +152,22 @@ const SupplierList = ({
                         <h3 className="text-xl font-bold text-gray-800 mb-1">
                           {supplier.companyName}
                         </h3>
-                        <p className="text-blue-600 font-medium mb-1">
-                          {supplier.businessType}
-                        </p>
+                        <div className="flex flex-wrap gap-1 mb-2">
+                          {supplier.businessType?.length > 0 ? (
+                            supplier.businessType.map((type, index) => (
+                              <span
+                                key={index}
+                                className="px-2 py-1 bg-blue-100 text-blue-800 rounded-full text-xs font-medium"
+                              >
+                                {type}
+                              </span>
+                            ))
+                          ) : (
+                            <span className="text-blue-600 font-medium text-sm">
+                              Business Type Not Specified
+                            </span>
+                          )}
+                        </div>
                         <div className="flex items-center gap-4 text-sm text-gray-600">
                           <div className="flex items-center gap-1">
                             <User size={14} />
@@ -167,11 +182,11 @@ const SupplierList = ({
                     </div>
 
                     {/* Details Section */}
-                    <div className="flex-1 grid grid-cols-2 md:grid-cols-4 gap-4">
+                    <div className="flex-1 grid grid-cols-2 md:grid-cols-5 gap-3">
                       <div className="bg-gray-50 rounded-xl p-3 text-center">
                         <Package
                           className="mx-auto text-blue-500 mb-1"
-                          size={20}
+                          size={18}
                         />
                         <p className="text-sm font-semibold text-gray-800">
                           {supplier.products?.length || 0}
@@ -182,7 +197,7 @@ const SupplierList = ({
                       <div className="bg-gray-50 rounded-xl p-3 text-center">
                         <MapPin
                           className="mx-auto text-green-500 mb-1"
-                          size={20}
+                          size={18}
                         />
                         <p className="text-sm font-semibold text-gray-800">
                           {supplier.warehouses?.length || 0}
@@ -191,17 +206,42 @@ const SupplierList = ({
                       </div>
 
                       <div className="bg-gray-50 rounded-xl p-3 text-center">
+                        <FileText
+                          className="mx-auto text-red-500 mb-1"
+                          size={18}
+                        />
+                        <p className="text-sm font-semibold text-gray-800">
+                          {supplier.documents?.length || 0}
+                        </p>
+                        <p className="text-xs text-gray-500">Documents</p>
+                      </div>
+
+                      <div className="bg-gray-50 rounded-xl p-3 text-center">
+                        <Truck
+                          className="mx-auto text-indigo-500 mb-1"
+                          size={18}
+                        />
+                        <p className="text-sm font-semibold text-gray-800">
+                          {supplier.shippingMethods?.length || 0}
+                        </p>
+                        <p className="text-xs text-gray-500">Shipping</p>
+                      </div>
+
+                      <div className="bg-gray-50 rounded-xl p-3 text-center">
                         <Clock
                           className="mx-auto text-purple-500 mb-1"
-                          size={20}
+                          size={18}
                         />
                         <p className="text-sm font-semibold text-gray-800">
                           {supplier.yearsInBusiness || "N/A"}
                         </p>
                         <p className="text-xs text-gray-500">Years</p>
                       </div>
+                    </div>
 
-                      <div className="bg-gray-50 rounded-xl p-3 text-center">
+                    {/* Status and Actions */}
+                    <div className="flex flex-col gap-3 lg:min-w-48">
+                      <div className="flex justify-center">
                         <span
                           className={`inline-flex items-center px-3 py-1 rounded-full text-xs font-semibold border ${getStatusColor(
                             supplier.status
@@ -210,38 +250,37 @@ const SupplierList = ({
                           {supplier.status}
                         </span>
                       </div>
-                    </div>
 
-                    {/* Actions */}
-                    <div className="flex flex-wrap gap-2 lg:min-w-64 justify-end">
-                      <Link
-                        to={`/supplier/${supplier._id}`}
-                        className="px-4 py-2 bg-blue-600 text-white rounded-xl hover:bg-blue-700 transition-colors duration-200 font-medium"
-                      >
-                        View Details
-                      </Link>
-
-                      {supplier.status !== "Approved" && (
-                        <button
-                          onClick={() =>
-                            updateSupplierStatus(supplier._id, "Approved")
-                          }
-                          className="px-4 py-2 bg-emerald-600 text-white rounded-xl hover:bg-emerald-700 transition-colors duration-200 font-medium"
+                      <div className="flex flex-wrap gap-2 justify-center">
+                        <Link
+                          to={`/supplier/${supplier._id}`}
+                          className="px-3 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors duration-200 font-medium text-sm"
                         >
-                          Approve
-                        </button>
-                      )}
+                          View Details
+                        </Link>
 
-                      {supplier.status !== "Rejected" && (
-                        <button
-                          onClick={() =>
-                            updateSupplierStatus(supplier._id, "Rejected")
-                          }
-                          className="px-4 py-2 bg-red-600 text-white rounded-xl hover:bg-red-700 transition-colors duration-200 font-medium"
-                        >
-                          Reject
-                        </button>
-                      )}
+                        {supplier.status !== "Approved" && (
+                          <button
+                            onClick={() =>
+                              updateSupplierStatus(supplier._id, "Approved")
+                            }
+                            className="px-3 py-2 bg-emerald-600 text-white rounded-lg hover:bg-emerald-700 transition-colors duration-200 font-medium text-sm"
+                          >
+                            Approve
+                          </button>
+                        )}
+
+                        {supplier.status !== "Rejected" && (
+                          <button
+                            onClick={() =>
+                              updateSupplierStatus(supplier._id, "Rejected")
+                            }
+                            className="px-3 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 transition-colors duration-200 font-medium text-sm"
+                          >
+                            Reject
+                          </button>
+                        )}
+                      </div>
                     </div>
                   </div>
                 </div>
