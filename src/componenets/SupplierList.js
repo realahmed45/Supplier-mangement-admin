@@ -67,23 +67,25 @@ const SupplierList = ({
           View Details
         </Link>
 
-        {userRole === "admin" && supplier.status !== "Approved" && (
-          <button
-            onClick={() => updateSupplierStatus(supplier._id, "Approved")}
-            className="px-3 py-2 bg-emerald-600 text-white rounded-lg hover:bg-emerald-700 transition-colors duration-200 font-medium text-sm"
-          >
-            Approve
-          </button>
-        )}
+        {(userRole === "admin" || userRole === "user") &&
+          supplier.status !== "Approved" && (
+            <button
+              onClick={() => updateSupplierStatus(supplier._id, "Approved")}
+              className="px-3 py-2 bg-emerald-600 text-white rounded-lg hover:bg-emerald-700 transition-colors duration-200 font-medium text-sm"
+            >
+              Approve
+            </button>
+          )}
 
-        {userRole === "admin" && supplier.status !== "Rejected" && (
-          <button
-            onClick={() => updateSupplierStatus(supplier._id, "Rejected")}
-            className="px-3 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 transition-colors duration-200 font-medium text-sm"
-          >
-            Reject
-          </button>
-        )}
+        {(userRole === "admin" || userRole === "user") &&
+          supplier.status !== "Rejected" && (
+            <button
+              onClick={() => updateSupplierStatus(supplier._id, "Rejected")}
+              className="px-3 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 transition-colors duration-200 font-medium text-sm"
+            >
+              Reject
+            </button>
+          )}
       </div>
     );
   };
